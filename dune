@@ -1,0 +1,13 @@
+
+(executable
+ (name main)
+ (public_name ocaml-elo.lib)
+ (preprocess
+  (pps ppx_deriving.std))
+ (libraries containers containers-data zarith ocamlgraph
+   imandra-base.interactive))
+
+(env
+ (dev
+  (flags
+   (:standard -w +a-4-44-42-48-66@8))))
