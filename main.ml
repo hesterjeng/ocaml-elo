@@ -96,6 +96,8 @@ let () =
   let john = Player.mk "john" in
   let brent = Player.mk "brent" in
   let garrett = Player.mk "garrett" in
+  let marcus = Player.mk "marcus" in
+  let evil_garrett = Player.mk "evil garrett" in
   Game.play andrew chase ALossBWin;
   Game.play andrew chase ALossBWin;
   Game.play andrew chase ALossBWin;
@@ -112,6 +114,13 @@ let () =
   Game.play john garrett AWinBLoss;
   Game.play andrew hunter ALossBWin;
   Game.play hunter garrett ALossBWin;
+  Game.play john garrett AWinBLoss;
+  Game.play john garrett ALossBWin;
+  Game.play john garrett AWinBLoss;
+  Game.play john andrew AWinBLoss;
+  Game.play marcus evil_garrett AWinBLoss;
+  Game.play marcus evil_garrett AWinBLoss;
+  Game.play marcus evil_garrett AWinBLoss;
   CCFormat.printf "@[%a@]@." Player.pp andrew;
   CCFormat.printf "@[%a@]@." Player.pp chase;
   CCFormat.printf "@[%a@]@." Player.pp hunter;
