@@ -1,31 +1,14 @@
-open Lwt.Infix
-
-type rating = float [@@deriving show]
-
-type result =
-  | AWinBLoss
-  | ALossBWin
-  | Draw
-
-module Player = struct
-  type t = {
-    name: string;
-    mutable rating: rating;
-  }
-  [@@deriving show]
-
-  let mk name : t = { name; rating = Float.of_int 1000 }
-end
+(* open Lwt.Infix *)
 
 module E = struct
-  let a (arating : rating) (brating : rating) =
+  let a (arating : Rating.t) (brating : Rating.t) =
     let diff = brating -. arating in
     let div1 = diff /. Float.of_int 400 in
     let exp = Float.pow (Float.of_int 10) div1 in
     let plusone = Float.one +. exp in
     Float.one /. plusone
 
-  let b (arating : rating) (brating : rating) =
+  let b (arating : Rating.t) (brating : Rating.t) =
     let diff = arating -. brating in
     let div1 = diff /. Float.of_int 400 in
     let exp = Float.pow (Float.of_int 10) div1 in
@@ -34,29 +17,31 @@ module E = struct
 end
 
 module R = struct
+  open Result
+
   let k = Float.of_int 100
 
   let one_half = Float.one /. Float.of_int 2
 
-  let awin (arating : rating) (brating : rating) =
+  let awin (arating : Rating.t) (brating : Rating.t) =
     Float.one -. E.a arating brating
 
-  let alose (arating : rating) (brating : rating) =
+  let alose (arating : Rating.t) (brating : Rating.t) =
     Float.zero -. E.a arating brating
 
-  let adraw (arating : rating) (brating : rating) =
+  let adraw (arating : Rating.t) (brating : Rating.t) =
     one_half -. E.a arating brating
 
-  let bwin (arating : rating) (brating : rating) =
+  let bwin (arating : Rating.t) (brating : Rating.t) =
     Float.one -. E.b arating brating
 
-  let blose (arating : rating) (brating : rating) =
+  let blose (arating : Rating.t) (brating : Rating.t) =
     Float.zero -. E.b arating brating
 
-  let bdraw (arating : rating) (brating : rating) =
+  let bdraw (arating : Rating.t) (brating : Rating.t) =
     one_half -. E.b arating brating
 
-  let a' (arating : rating) (brating : rating) (result : result) =
+  let a' (arating : Rating.t) (brating : Rating.t) (result : Result.t) =
     let res1 =
       match result with
       | AWinBLoss -> awin arating brating
@@ -66,7 +51,7 @@ module R = struct
     let rhs = k *. res1 in
     arating +. rhs
 
-  let b' (arating : rating) (brating : rating) (result : result) =
+  let b' (arating : Rating.t) (brating : Rating.t) (result : Result.t) =
     let res1 =
       match result with
       | AWinBLoss -> blose arating brating
@@ -80,45 +65,15 @@ end
 module Game = struct
   open Player
 
-  let play (p1 : Player.t) (p2 : Player.t) (res : result) =
+  let play (p1 : Player.t) (p2 : Player.t) (res : Result.t) =
     let a' = R.a' p1.rating p2.rating res in
     let b' = R.b' p1.rating p2.rating res in
     p1.rating <- a';
     p2.rating <- b'
 end
 
-module Q = struct
-  open Caqti_request.Infix
-  open Caqti_type.Std
-
-  let player =
-    let open Player in
-    let encode {name; rating} = Ok (name,rating) in
-    let decode (name, rating) = Ok {name; rating} in
-    let rep = Caqti_type.(tup2 string float) in
-    custom ~encode ~decode rep
-
-  let create_playerreg =
-    unit ->. unit @@
-    {eos|
-      CREATE TEMPORARY TABLE playerreg (
-        name text NOT NULL,
-        rating real NOT NULL,
-      )
-    |eos}
-
-  let reg_player =
-    tup2 string float ->. unit @@
-    "INSERT INTO playerreg (name, rating) VALUES (?, ?)"
-
-  let update_rating_ =
-    tup2 string float ->. unit @@
-    "UPDATE playerreg SET rating = ? WHERE name = ?"
-
-end
-
-
 let () =
+  let open Result in
   let andrew = Player.mk "andrew" in
   let chase = Player.mk "chase" in
   let hunter = Player.mk "hunter" in
@@ -130,6 +85,8 @@ let () =
   let haunted_hunter = Player.mk "haunted hunter" in
   let katie = Player.mk "katie" in
   let kyle = Player.mk "kyle" in
+  let daily = Player.mk "andrew the beast" in
+  let patrick = Player.mk "patrick" in
   Game.play andrew chase ALossBWin;
   Game.play andrew chase ALossBWin;
   Game.play andrew chase ALossBWin;
@@ -170,6 +127,25 @@ let () =
 
   Game.play hunter haunted_hunter AWinBLoss;
 
+  Game.play marcus john AWinBLoss;
+  Game.play marcus hunter AWinBLoss;
+
+  Game.play marcus john Draw;
+  Game.play marcus john ALossBWin;
+
+  Game.play marcus garrett AWinBLoss;
+  Game.play marcus garrett ALossBWin;
+  Game.play john garrett AWinBLoss;
+  Game.play marcus john AWinBLoss;
+  Game.play garrett john AWinBLoss;
+
+  Game.play john daily AWinBLoss;
+  Game.play john daily AWinBLoss;
+  Game.play hunter patrick AWinBLoss;
+  Game.play brent hunter AWinBLoss;
+  Game.play daily john AWinBLoss;
+  Game.play hunter daily AWinBLoss;
+
   CCFormat.printf "@[%a@]@." Player.pp andrew;
   CCFormat.printf "@[%a@]@." Player.pp chase;
   CCFormat.printf "@[%a@]@." Player.pp hunter;
@@ -179,5 +155,21 @@ let () =
   CCFormat.printf "@[%a@]@." Player.pp marcus;
   CCFormat.printf "@[%a@]@." Player.pp katie;
   CCFormat.printf "@[%a@]@." Player.pp kyle;
+  CCFormat.printf "@[%a@]@." Player.pp patrick;
+  CCFormat.printf "@[%a@]@." Player.pp daily;
   CCFormat.printf "@[%a@]@." Player.pp evil_garrett;
   CCFormat.printf "@[%a@]@." Player.pp haunted_hunter
+
+(* { Main.Player.name = "marcus"; rating = 1186.37120792 } *)
+(* { Main.Player.name = "chase"; rating = 1089.36984171 } *)
+(* { Main.Player.name = "garrett"; rating = 1089.25030553 } *)
+(* { Main.Player.name = "john"; rating = 1076.83255193 } *)
+(* { Main.Player.name = "brent"; rating = 1031.201288 } *)
+(* { Main.Player.name = "hunter"; rating = 1029.40437377 } *)
+(* { Main.Player.name = "andrew the beast"; rating = 957.10069023 } *)
+(* { Main.Player.name = "kyle"; rating = 947.554255414 } *)
+(* { Main.Player.name = "patrick"; rating = 947.035253108 } *)
+(* { Main.Player.name = "andrew"; rating = 943.160028452 } *)
+(* { Main.Player.name = "haunted hunter"; rating = 941.556163971 } *)
+(* { Main.Player.name = "evil garrett"; rating = 886.916018213 } *)
+(* { Main.Player.name = "katie"; rating = 874.248021764 } *)
