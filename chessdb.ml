@@ -23,24 +23,45 @@ module Queries = struct
     (tup2 string float ->. unit)
     @@ "INSERT INTO playerreg (name, rating) VALUES (?, ?)"
 
-  let update_rating_ =
+  let update_rating =
     (tup2 string float ->. unit)
     @@ "UPDATE playerreg SET rating = ? WHERE name = ?"
 
   let select_all = (unit ->* player) @@ "SELECT * FROM playerreg"
+
+  let select_player =
+    string ->? string @@
+    "SELECT * FROM playerreg WHERE name = ?"
 end
 
-let connection_url = "postgresql://localhost:5432"
+(* Wrappers around the Generic Execution Functions
+ * ===============================================
+ *
+ * Here we combine the above queries with a suitable execution function, for
+ * convenience and to enforce type safety.  We could have defined these in a
+ * functor on CONNECTION and used the resulting module in place of Db. *)
 
-(* This is the connection pool we will use for executing DB operations. *)
-let pool =
-  match Caqti_lwt.connect_pool ~max_size:10 (Uri.of_string connection_url) with
-  | Ok pool -> pool
-  | Error err -> failwith (Caqti_error.show err)
+(* Db.exec runs a statement which must not return any rows.  Errors are
+ * reported as exceptions. *)
+let create_playerreg (module Db : Caqti_lwt.CONNECTION) =
+  Db.exec Queries.create_playerreg ()
 
-type error = Database_error of string
+let reg_player (module Db : Caqti_lwt.CONNECTION) (player : Player.t) =
+  let name = Player.name player in
+  let rating = Player.rating player in
+  Db.exec Queries.reg_player (name, rating)
 
-let or_error m =
-  match%lwt m with
-  | Ok a -> Ok a |> Lwt.return
-  | Error e -> Error (Database_error (Caqti_error.show e)) |> Lwt.return
+let update_rating (module Db : Caqti_lwt.CONNECTION) (player : Player.t) =
+  let name = Player.name player in
+  let rating = Player.rating player in
+  Db.exec Queries.update_rating (name, rating)
+
+(* Db.find runs a query which must return at most one row.  The result is a
+ * option, since it's common to seach for entries which don't exist. *)
+let find_player (module Db : Caqti_lwt.CONNECTION) (player : Player.t) =
+  let name = Player.name player in
+  Db.find_opt Queries.select_player name
+
+(* Db.iter_s iterates sequentially over the set of result rows of a query. *)
+let iter_all (module Db : Caqti_lwt.CONNECTION) f =
+  Db.iter_s Queries.select_all f ()
