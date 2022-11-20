@@ -4,7 +4,7 @@
  (preprocess
   (pps ppx_deriving.std lwt_ppx))
  (libraries containers containers-data zarith ocamlgraph lwt caqti caqti-lwt
-   caqti-driver-postgresql))
+   caqti-driver-postgresql cmdliner))
 
 (env
  (dev
