@@ -1,0 +1,46 @@
+open Caqti_request.Infix
+open Caqti_type.Std
+
+module Queries = struct
+  let player =
+    let open Caqti_type.Std in
+    let open Player in
+    let encode { name; rating } = Ok (name, rating) in
+    let decode (name, rating) = Ok { name; rating } in
+    let rep = Caqti_type.(tup2 string float) in
+    custom ~encode ~decode rep
+
+  let create_playerreg =
+    (unit ->. unit)
+    @@ {eos|
+      CREATE TEMPORARY TABLE playerreg (
+        name text NOT NULL,
+        rating real NOT NULL,
+      )
+    |eos}
+
+  let reg_player =
+    (tup2 string float ->. unit)
+    @@ "INSERT INTO playerreg (name, rating) VALUES (?, ?)"
+
+  let update_rating_ =
+    (tup2 string float ->. unit)
+    @@ "UPDATE playerreg SET rating = ? WHERE name = ?"
+
+  let select_all = (unit ->* player) @@ "SELECT * FROM playerreg"
+end
+
+let connection_url = "postgresql://localhost:5432"
+
+(* This is the connection pool we will use for executing DB operations. *)
+let pool =
+  match Caqti_lwt.connect_pool ~max_size:10 (Uri.of_string connection_url) with
+  | Ok pool -> pool
+  | Error err -> failwith (Caqti_error.show err)
+
+type error = Database_error of string
+
+let or_error m =
+  match%lwt m with
+  | Ok a -> Ok a |> Lwt.return
+  | Error e -> Error (Database_error (Caqti_error.show e)) |> Lwt.return
