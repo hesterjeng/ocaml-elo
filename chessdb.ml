@@ -1,5 +1,9 @@
 (* open Caqti_request.Infix *)
 (* open Caqti_type.Std *)
+(* open Caqti_driver_postgresql *)
+
+(* let create_db () = *)
+(*   let pool = create_pool *)
 
 (* module Queries = struct *)
 (*   let player = *)
@@ -68,4 +72,4 @@
 
 let all : Game.t list ref = ref []
 
-let add x = all := x :: !all
+let add (x : Game.t) = all := x :: !all

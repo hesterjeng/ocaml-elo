@@ -5,8 +5,18 @@ type t = {
   mutable current_streak: int;
 }
 
+let all_players = ref []
+
 let mk name : t =
-  { name; rating = Float.of_int 1000; games_played = 0; current_streak = 0 }
+  let res = { name; rating = Float.of_int 1000; games_played = 0; current_streak = 0 } in
+  all_players := res :: !all_players;
+  res
+
+let mk_score name score =
+  let res = { name; rating = Float.of_int score; games_played = 0; current_streak = 0 } in
+  all_players := res :: !all_players;
+  res
+
 
 let compare x y = Float.compare x.rating y.rating
 

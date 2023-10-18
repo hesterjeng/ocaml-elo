@@ -2,6 +2,7 @@
 
 let () =
   let open Result in
+  let _god = Player.mk_score "god" 10000 in
   let andrew = Player.mk "andrew" in
   let chase = Player.mk "chase" in
   let hunter = Player.mk "hunter" in
@@ -11,11 +12,13 @@ let () =
   let marcus = Player.mk "marcus" in
   let evil_garrett = Player.mk "evil garrett" in
   let haunted_hunter = Player.mk "haunted hunter" in
+  let hunter_banes = haunted_hunter in
   let katie = Player.mk "katie" in
   let kyle = Player.mk "kyle" in
   let daily = Player.mk "andrew the beast" in
   let patrick = Player.mk "patrick" in
-  let chris = Player.mk "chris l" in
+  let patrick_f = patrick in
+  let chris = Player.mk "chris L" in
   let barry = Player.mk "barry" in
   let ricky = Player.mk "ricky" in
   let cyrus = Player.mk "cyrus" in
@@ -27,7 +30,7 @@ let () =
   let conrad = Player.mk "conrad" in
   let zach = Player.mk "zach" in
   let tyler = Player.mk "tyler" in
-  let neal = Player.mk "tyler" in
+  let neal = Player.mk "neil" in
   let jaybee = Player.mk "jaybee" in
   let diego = Player.mk "diego" in
   let mauricio = Player.mk "mauricio" in
@@ -36,61 +39,29 @@ let () =
   let jack = Player.mk "jack" in
   let santi = Player.mk "santi" in
   let greg_c = Player.mk "greg" in
-  let andrew_v = Player.mk "andrew v" in
+  let andrew_v = Player.mk "andrew V" in
   let erik = Player.mk "erik" in
-  let juan = Player.mk "juan" in
-  let alex = Player.mk "alex o" in
-  let phillip = Player.mk "phillip o" in
-
-  let all_players =
-    [
-      andrew;
-      chase;
-      hunter;
-      john;
-      brent;
-      garrett;
-      marcus;
-      evil_garrett;
-      haunted_hunter;
-      katie;
-      kyle;
-      daily;
-      patrick;
-      chris;
-      barry;
-      ricky;
-      cyrus;
-      eric;
-      matt;
-      mark;
-      bryan;
-      brock;
-      conrad;
-      zach;
-      tyler;
-      neal;
-      jaybee;
-      diego;
-      mauricio;
-      santiago;
-      iliana;
-      jack;
-      santi;
-      greg_c;
-      andrew_v;
-      erik;
-      juan;
-      alex;
-      phillip;
-    ]
-  in
-
-  let _a = AWinBLoss in
+  let _erik_d = erik in
+  let juan = Player.mk "Juan G" in
+  let alex = Player.mk "alex O" in
+  let alex_o = alex in
+  let phillip = Player.mk "phillip O" in
+  let nicole_b = Player.mk "nicole B" in
+  let levi_m = Player.mk "levi M" in
+  let ricardo_martinez = Player.mk "ricardo M" in
+  let robert_l = Player.mk "robert L" in
+  let casteos = Player.mk "casteos" in
+  let meed = Player.mk "alex M" in
+  let charles_a = Player.mk "charles A" in
+  let grego = Player.mk "grego" in
+  let eric_k = Player.mk "eric K" in
+  let andy = Player.mk "andy" in
+  let sebass = Player.mk "sebass" in
 
   let play = Game.play in
 
   let ( > ) a b =
+    (* Game.make ~a ~b ~res:AWinBLoss; *)
     Chessdb.add @@ Game.make ~a ~b ~res:AWinBLoss;
     a.Player.games_played <- a.Player.games_played + 1;
     b.Player.games_played <- b.Player.games_played + 1;
@@ -98,11 +69,12 @@ let () =
   in
 
   let ( === ) a b =
-    Chessdb.add @@ Game.make ~a ~b ~res:Draw;
+    (* Chessdb.add @@ Game.make ~a ~b ~res:Draw; *)
     play a b Draw
   in
 
   let old_game a b res =
+    Chessdb.add @@ Game.make ~a ~b ~res;
     a.Player.games_played <- a.Player.games_played + 1;
     b.Player.games_played <- b.Player.games_played + 1;
     match res with
@@ -381,21 +353,134 @@ let () =
   juan > diego;
 
   (* 4/3/23 *)
+  (* BUG: MISSING *)
 
-  (* CCFormat.printf "@[%a@]@." Player.pp andrew; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp chase; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp hunter; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp john; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp brent; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp garrett; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp marcus; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp katie; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp kyle; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp patrick; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp daily; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp evil_garrett; *)
-  (* CCFormat.printf "@[%a@]@." Player.pp haunted_hunter; *)
-  let sorted = CCList.sort Player.compare all_players |> CCList.rev in
+  (* 4/5/23 *)
+  (* BUG: MISSING *)
+
+  (* 4/10/23 *)
+  hunter > greg_c;
+  andrew > chase;
+  hunter > alex;
+  greg_c > levi_m;
+  greg_c > nicole_b;
+  cyrus > john;
+  andrew > diego;
+  erik > greg_c;
+  marcus > cyrus;
+  hunter > erik;
+  diego > andrew;
+  marcus > cyrus;
+
+  (* 4/17/23 *)
+  andrew > diego;
+  hunter > diego;
+  diego > phillip;
+  cyrus > andrew_v;
+  hunter > alex;
+  cyrus > andrew_v;
+  neal > hunter;
+  cyrus > john;
+
+  (* ? *)
+
+  barry > andy;
+  chase > andy;
+  hunter > barry;
+  andy > chase;
+  diego > hunter;
+
+  (* 5/3 *)
+
+  alex_o > andrew;
+  juan > erik;
+  erik > alex_o;
+
+  (* 5/8 *)
+
+  daily > hunter_banes;
+
+  (* ? *)
+
+  juan > chase;
+  hunter > andrew;
+  patrick > hunter;
+  patrick > sebass;
+
+  (*  *)
+
+  andrew > hunter;
+  john > hunter;
+  marcus === hunter;
+  marcus > hunter;
+
+  (* ? *)
+
+  andrew > diego;
+  diego > andrew;
+  andrew > chase;
+  andrew > chase;
+  hunter > diego;
+  hunter > diego;
+  hunter > diego;
+  hunter > ricardo_martinez;
+
+  (* 5/20 *)
+
+  john > garrett;
+  john === garrett;
+  patrick > hunter;
+  marcus > garrett;
+  john > robert_l;
+  hunter > casteos;
+  marcus > patrick;
+  marcus > john;
+  robert_l > hunter;
+
+  (* ? *)
+
+  john > erik;
+  garrett > erik;
+  garrett > charles_a;
+  hunter > erik;
+  marcus > grego;
+  marcus > grego;
+  garrett > eric_k;
+  eric_k > garrett;
+
+  (* 5/29 *)
+
+  patrick > hunter;
+  hunter > patrick;
+  erik > andrew_v;
+  john > erik;
+  john > garrett;
+  john > garrett;
+  john > marcus;
+  john > cyrus;
+
+  (* thursday *)
+  patrick > alex_o;
+  john > alex_o;
+  john > patrick;
+  andrew > chase;
+  hunter > chase;
+  alex > phillip;
+  patrick_f > alex_o;
+
+  (* 6/12/23  *)
+  andrew === hunter;
+  marcus > patrick;
+  marcus > patrick;
+  marcus > patrick;
+  marcus > hunter;
+  hunter > patrick;
+  john > hunter;
+  hunter > john;
+  marcus > meed;
+  hunter > john;
+
+  let sorted = CCList.sort Player.compare !Player.all_players |> CCList.rev in
   let list_printer = CCFormat.list ~sep:(CCFormat.return "") Player.pp in
   CCFormat.printf "@[%a@]@." list_printer sorted;
   CCFormat.printf "@[Total number of games: %d@]@." (List.length !Chessdb.all);
